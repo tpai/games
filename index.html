@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Gaming Records</title>
+<script type="text/javascript" nonce="9b6fb03a3a74467e8a97bc7c542" src="//local.adguard.org?ts=1777051376481&amp;type=content-script&amp;dmn=claude.ai&amp;url=https%3A%2F%2Fclaude.ai%2Fdesign%2Fv1%2Fdesign%2Fprojects%2Ffb64a9d3-a8be-452a-9f48-442c005395aa%2Fdownload%3Fpath%3DGaming%2520Records.html&amp;app=com.google.Chrome&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="9b6fb03a3a74467e8a97bc7c542" src="//local.adguard.org?ts=1777051376481&amp;name=AdGuard%20Extra&amp;type=user-script"></script><link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #070b12;
+    --surface: #0c1118;
+    --surface2: #111827;
+    --row-hover: #141e2d;
+    --border: rgba(255,255,255,0.06);
+    --text: #dde4f0;
+    --muted: #6b7a96;
+    --accent: #4da6ff;
+    --accent-glow: rgba(77,166,255,0.2);
+    --green: #4eca7a;
+    --green-dim: rgba(78,202,122,0.15);
+    --pill-active-bg: #4da6ff;
+    --radius: 8px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 48px 56px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .header-left h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 0%, #4da6ff 60%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .header-left p {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .stats {
+    display: flex;
+    gap: 32px;
+    flex-shrink: 0;
+  }
+
+  .stat { text-align: right; }
+
+  .stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  /* progress bar */
+  .progress-wrap {
+    padding: 20px 56px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4da6ff, #4eca7a);
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 0 10px rgba(77,166,255,0.4);
+  }
+
+  .progress-pct {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+    width: 36px;
+    text-align: right;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 56px;
+    background: rgba(7,11,18,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .filter-row-genres {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 0 0 240px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    width: 15px;
+    height: 15px;
+  }
+
+  #search {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  #search::placeholder { color: var(--muted); }
+
+  #search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .filter-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .filter-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .genre-pills {
+    display: flex;
+    gap: 5px;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 1px;
+  }
+  .genre-pills::-webkit-scrollbar { display: none; }
+
+  .pill {
+    padding: 4px 11px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  .pill.active {
+    background: var(--pill-active-bg);
+    border-color: var(--pill-active-bg);
+    color: #fff;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  .company-select {
+    padding: 8px 28px 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a96' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.2s;
+    max-width: 180px;
+  }
+
+  .company-select:focus { border-color: var(--accent); }
+  .company-select option { background: #111827; color: var(--text); }
+
+  .results-count { font-size: 0.72rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; margin-left: auto; }
+
+  /* ── TABLE WRAP ── */
+  .table-wrap {
+    padding: 24px 56px 80px;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+
+  thead th:hover { color: var(--text); }
+
+  thead th .sort-icon {
+    display: inline-block;
+    margin-left: 4px;
+    opacity: 0.35;
+    font-size: 0.6rem;
+  }
+
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
+  /* column widths */
+  .col-status { width: 52px; text-align: center; }
+  .col-title  { width: auto; }
+  .col-studio { width: 200px; }
+  .col-genre  { width: 280px; }
+  .col-plat   { width: 140px; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: opacity 0.22s ease, transform 0.22s ease, background 0.12s;
+  }
+
+  tbody tr:hover {
+    background: var(--row-hover);
+  }
+
+  tbody tr.is-hiding {
+    opacity: 0;
+    transform: translateX(-8px);
+    pointer-events: none;
+  }
+
+  tbody tr.is-hidden {
+    display: none;
+  }
+
+  tbody tr.is-appearing {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  /* Status cell */
+  .status-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .status-dot.done {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1.5px solid rgba(78,202,122,0.35);
+    box-shadow: 0 0 6px rgba(78,202,122,0.15);
+  }
+
+  .status-dot.todo {
+    background: rgba(107,122,150,0.1);
+    color: var(--muted);
+    border: 1.5px solid rgba(107,122,150,0.2);
+  }
+
+  /* Title cell */
+  .title-cell {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
+
+  /* Studio cell */
+  .studio-cell {
+    color: var(--muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  tbody tr:hover .studio-cell { color: var(--accent); }
+
+  /* Genre tags */
+  .genre-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .gtag {
+    font-size: 0.62rem;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+  }
+
+  /* Platform badge */
+  .plat-badge {
+    font-size: 0.62rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .plat-steam   { background: rgba(23,72,120,0.3); color: #6ba8e0; border: 1px solid rgba(107,168,224,0.2); }
+  .plat-switch  { background: rgba(228,0,15,0.15); color: #ff4a56; border: 1px solid rgba(255,74,86,0.2); }
+  .plat-ps4     { background: rgba(0,48,135,0.3);  color: #5588dd; border: 1px solid rgba(85,136,221,0.2); }
+  .plat-quest   { background: rgba(15,117,224,0.2); color: #48a0f0; border: 1px solid rgba(72,160,240,0.2); }
+
+  /* Empty state */
+  .empty-row td {
+    text-align: center;
+    padding: 64px 20px;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 99px; }
+
+  @media (max-width: 768px) {
+    header { padding: 24px 20px 0; flex-direction: column; align-items: flex-start; }
+    .progress-wrap, .filter-bar, .table-wrap { padding-left: 20px; padding-right: 20px; }
+    .col-studio, .col-plat { display: none; }
+    .col-genre { width: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Gaming Records</h1>
+    <p>Personal collection · All platforms</p>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="stat-completed">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <span class="progress-pct" id="progress-pct">0%</span>
+</div>
+
+<div class="filter-bar">
+  <!-- Row 1: Search · Status · Platform · Count -->
+  <div class="filter-row">
+    <div class="search-wrap">
+      <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search" placeholder="Search games…" autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="filter-divider"></div>
+    <span class="filter-label">Status</span>
+    <div class="genre-pills" id="status-pills">
+      <button class="pill active" data-status="all">All</button>
+      <button class="pill" data-status="done">✓ Completed</button>
+      <button class="pill" data-status="todo">· Not Completed</button>
+    </div>
+
+    <div class="filter-divider"></div>
+    <span class="filter-label">Platform</span>
+    <div class="genre-pills" id="platform-pills">
+      <button class="pill active" data-platform="all">All</button>
+      <button class="pill" data-platform="Steam">Steam</button>
+      <button class="pill" data-platform="Nintendo Switch">Switch</button>
+      <button class="pill" data-platform="PlayStation">PlayStation</button>
+      <button class="pill" data-platform="Meta Quest">Quest</button>
+    </div>
+
+    <span class="results-count" id="results-count"></span>
+  </div>
+
+  <!-- Row 2: Genre · Studio -->
+  <div class="filter-row">
+    <span class="filter-label" style="flex-shrink:0">Genre</span>
+    <div class="filter-row-genres">
+      <div class="genre-pills" id="genre-pills"></div>
+    </div>
+    <div class="filter-divider" style="flex-shrink:0"></div>
+    <span class="filter-label" style="flex-shrink:0">Studio</span>
+    <select class="company-select" id="company-select">
+      <option value="">All Studios</option>
+    </select>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-status" data-sort="done" title="Sort by status">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:block;margin:0 auto"><polyline points="20 6 9 17 4 12"/></svg>
+        </th>
+        <th class="col-title" data-sort="title">Title <span class="sort-icon">↕</span></th>
+        <th class="col-studio" data-sort="company">Studio <span class="sort-icon">↕</span></th>
+        <th class="col-genre">Genre</th>
+        <th class="col-plat">Platform</th>
+      </tr>
+    </thead>
+    <tbody id="game-tbody"></tbody>
+  </table>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const GAMES = [
+  { id:1,  title:"Persona 5 Scramble: The Phantom Strikers", company:"Omega Force",              genres:["Action RPG","Hack and Slash","JRPG"],            done:true,  platform:"PlayStation"           },
+  { id:2,  title:"Persona 5",                                 company:"Atlus",                    genres:["JRPG","Turn-Based RPG","Story Rich"],            done:true,  platform:"PlayStation"           },
+  { id:3,  title:"Hogwarts Legacy",                           company:"Avalanche Software",       genres:["Action RPG","Open World","Magic"],               done:true,  platform:"PlayStation"           },
+  { id:4,  title:"Days Gone",                                  company:"Bend Studio",              genres:["Action-Adventure","Survival","Open World"],      done:true,  platform:"PlayStation"           },
+  { id:5,  title:"The Elder Scrolls V: Skyrim",               company:"Bethesda Game Studios",    genres:["Action RPG","Open World","Fantasy"],             done:true,  platform:"Steam"           },
+  { id:6,  title:"Diablo IV",                                  company:"Blizzard Entertainment",   genres:["Action RPG","Hack and Slash","Dark Fantasy"],    done:true,  platform:"PlayStation"           },
+  { id:7,  title:"Dragon's Dogma: Dark Arisen",               company:"Capcom",                   genres:["Action RPG","Open World","Fantasy"],             done:true,  platform:"PlayStation"           },
+  { id:8,  title:"Resident Evil 4 VR",                        company:"Armature Studio",          genres:["VR","Action-Adventure","Survival Horror"],       done:true,  platform:"Meta Quest"      },
+  { id:9,  title:"The Witcher 3: Hearts of Stone",            company:"CD Projekt Red",           genres:["Action RPG","Open World","Story Rich"],          done:true,  platform:"Nintendo Switch"           },
+  { id:10, title:"Cyberpunk 2077: Phantom Liberty",           company:"CD Projekt Red",           genres:["Action RPG","Open World","Cyberpunk"],           done:true,  platform:"PlayStation"           },
+  { id:11, title:"Cyberpunk 2077",                             company:"CD Projekt Red",           genres:["Action RPG","Open World","Cyberpunk"],           done:true,  platform:"PlayStation"           },
+  { id:12, title:"The Witcher 3: Wild Hunt",                  company:"CD Projekt Red",           genres:["Action RPG","Open World","Fantasy"],             done:true,  platform:"PlayStation"           },
+  { id:13, title:"Thronebreaker: The Witcher Tales",          company:"CD Projekt Red",           genres:["RPG","Card Game","Deck Building"],               done:true,  platform:"Nintendo Switch"           },
+  { id:14, title:"The Legend of Tianding",                    company:"CGCG Inc.",                genres:["Action","Beat 'em up","Metroidvania"],            done:true,  platform:"Nintendo Switch"           },
+  { id:15, title:"Rise of the Tomb Raider",                   company:"Crystal Dynamics",         genres:["Action-Adventure","Stealth","Platformer"],       done:true,  platform:"PlayStation"           },
+  { id:16, title:"Life is Strange: Before the Storm",         company:"Deck Nine Games",          genres:["Adventure","Interactive Drama","Story Rich"],    done:true,  platform:"PlayStation"           },
+  { id:17, title:"Battlefield 1",                              company:"DICE",                     genres:["First-Person Shooter","Multiplayer","War"],      done:true,  platform:"PlayStation"           },
+  { id:18, title:"Shadow of the Tomb Raider",                 company:"Eidos-Montréal",           genres:["Action-Adventure","Stealth","Platformer"],       done:true,  platform:"PlayStation"           },
+  { id:19, title:"Kena: Bridge of Spirits",                   company:"Ember Lab",                genres:["Action-Adventure","Puzzle","Fantasy"],           done:true,  platform:"PlayStation"           },
+  { id:20, title:"The Legend of Heroes: Trails into Reverie", company:"Nihon Falcom",             genres:["JRPG","Turn-Based RPG","Story Rich"],            done:false, platform:"Nintendo Switch"           },
+  { id:21, title:"The Room VR: A Dark Matter",                company:"Fireproof Games",          genres:["VR","Puzzle","Mystery"],                         done:true,  platform:"Meta Quest"           },
+  { id:22, title:"Elden Ring: Shadow of the Erdtree",         company:"FromSoftware",             genres:["Action RPG","Souls-like","Open World"],          done:false, platform:"PlayStation"           },
+  { id:23, title:"Elden Ring",                                 company:"FromSoftware",             genres:["Action RPG","Souls-like","Open World"],          done:true,  platform:"PlayStation"           },
+  { id:24, title:"Dark Souls III",                             company:"FromSoftware",             genres:["Action RPG","Souls-like","Dark Fantasy"],        done:true,  platform:"PlayStation"           },
+  { id:25, title:"Bloodborne: The Old Hunters",               company:"FromSoftware",             genres:["Action RPG","Souls-like","Survival Horror"],     done:true,  platform:"PlayStation"   },
+  { id:26, title:"Dark Souls: Remastered",                    company:"FromSoftware",             genres:["Action RPG","Souls-like","Dark Fantasy"],        done:true,  platform:"PlayStation"           },
+  { id:27, title:"Sekiro: Shadows Die Twice",                 company:"FromSoftware",             genres:["Action-Adventure","Souls-like","Stealth"],       done:true,  platform:"PlayStation"           },
+  { id:28, title:"Pokémon Scarlet & Violet",                  company:"Game Freak",               genres:["RPG","Open World","Turn-Based"],                 done:false, platform:"Nintendo Switch" },
+  { id:29, title:"Pokémon Legends: Arceus",                   company:"Game Freak",               genres:["Action RPG","Open World","Turn-Based"],          done:false, platform:"Nintendo Switch" },
+  { id:30, title:"Pokémon Sword & Shield",                    company:"Game Freak",               genres:["RPG","Turn-Based","Fantasy"],                    done:true,  platform:"Nintendo Switch" },
+  { id:31, title:"Pokémon: Let's Go, Eevee!",                 company:"Game Freak",               genres:["RPG","Turn-Based","Fantasy"],                    done:true,  platform:"Nintendo Switch" },
+  { id:32, title:"Horizon Forbidden West",                    company:"Guerrilla Games",          genres:["Action RPG","Open World","Sci-Fi"],              done:true,  platform:"PlayStation"           },
+  { id:33, title:"Horizon Zero Dawn",                          company:"Guerrilla Games",          genres:["Action RPG","Open World","Sci-Fi"],              done:true,  platform:"PlayStation"           },
+  { id:34, title:"It Takes Two",                              company:"Hazelight Studios",        genres:["Co-op","Platformer","Puzzle"],                   done:true,  platform:"PlayStation"           },
+  { id:35, title:"Middle-earth: Shadow of War",               company:"Monolith Productions",     genres:["Action RPG","Open World","Fantasy"],             done:true,  platform:"Steam"           },
+  { id:36, title:"Minecraft Legends",                          company:"Mojang Studios",           genres:["Action-Strategy","Sandbox","Fantasy"],           done:false, platform:"PlayStation"           },
+  { id:37, title:"Uncharted 4: A Thief's End",                company:"Naughty Dog",              genres:["Action-Adventure","Platformer","Story Rich"],    done:false, platform:"PlayStation"           },
+  { id:38, title:"The Last of Us Part I",                     company:"Naughty Dog",              genres:["Action-Adventure","Survival","Story Rich"],      done:true,  platform:"PlayStation"           },
+  { id:39, title:"Luigi's Mansion 2 HD",                      company:"Next Level Games",         genres:["Action-Adventure","Puzzle","Platformer"],        done:true,  platform:"Nintendo Switch" },
+  { id:40, title:"Luigi's Mansion 3",                          company:"Next Level Games",         genres:["Action-Adventure","Puzzle","Co-op"],             done:true,  platform:"Nintendo Switch" },
+  { id:41, title:"Crown Trick",                                company:"Next Studios",             genres:["Roguelike","Turn-Based","Dungeon Crawler"],      done:false, platform:"Nintendo Switch"           },
+  { id:42, title:"Ys VIII: Lacrimosa of Dana",                company:"Nihon Falcom",             genres:["Action RPG","JRPG","Story Rich"],                done:true,  platform:"PlayStation"           },
+  { id:43, title:"Pikmin 4",                                   company:"Nintendo",                 genres:["Real-Time Strategy","Puzzle","Fantasy"],         done:false, platform:"Nintendo Switch" },
+  { id:44, title:"The Legend of Zelda: Link's Awakening",     company:"Nintendo",                 genres:["Action-Adventure","Puzzle","Fantasy"],           done:true,  platform:"Nintendo Switch" },
+  { id:45, title:"Super Mario 3D World + Bowser's Fury",      company:"Nintendo",                 genres:["Platformer","Co-op","Fantasy"],                  done:true,  platform:"Nintendo Switch" },
+  { id:46, title:"Beyond: Two Souls",                          company:"Quantic Dream",            genres:["Interactive Drama","Story Rich","Adventure"],    done:true,  platform:"PlayStation"           },
+  { id:47, title:"Detroit: Become Human",                      company:"Quantic Dream",            genres:["Interactive Drama","Story Rich","Sci-Fi"],       done:true,  platform:"PlayStation"           },
+  { id:48, title:"Strange Brigade",                            company:"Rebellion Developments",   genres:["Third-Person Shooter","Co-op","Exploration"],    done:true,  platform:"Steam"           },
+  { id:49, title:"Red Dead Redemption 2",                     company:"Rockstar Games",           genres:["Action-Adventure","Open World","Western"],       done:true,  platform:"PlayStation"           },
+  { id:50, title:"Grand Theft Auto V",                         company:"Rockstar North",           genres:["Action-Adventure","Open World","Crime"],         done:true,  platform:"Steam"           },
+  { id:51, title:"Batman: Arkham Knight",                      company:"Rocksteady Studios",       genres:["Action-Adventure","Stealth","Superhero"],        done:true,  platform:"PlayStation"           },
+  { id:52, title:"Like a Dragon: Ishin!",                     company:"Ryu Ga Gotoku Studio",     genres:["Action RPG","JRPG","Historical"],                done:false, platform:"PlayStation"           },
+  { id:53, title:"Like a Dragon Gaiden: The Man Who Erased His Name", company:"Ryu Ga Gotoku Studio", genres:["Action","JRPG","Beat 'em up"],              done:true,  platform:"PlayStation"           },
+  { id:54, title:"Yakuza: Kiwami 2",                           company:"Ryu Ga Gotoku Studio",     genres:["Action","JRPG","Beat 'em up"],                  done:true,  platform:"PlayStation"           },
+  { id:55, title:"Yakuza: Kiwami",                             company:"Ryu Ga Gotoku Studio",     genres:["Action","JRPG","Beat 'em up"],                  done:true,  platform:"PlayStation"           },
+  { id:56, title:"Yakuza: Like a Dragon",                     company:"Ryu Ga Gotoku Studio",     genres:["JRPG","Turn-Based RPG","Comedy"],               done:true,  platform:"PlayStation"           },
+  { id:57, title:"Yakuza 6: The Song of Life",                company:"Ryu Ga Gotoku Studio",     genres:["Action","JRPG","Beat 'em up"],                  done:true,  platform:"PlayStation"           },
+  { id:58, title:"Yakuza 0",                                   company:"Ryu Ga Gotoku Studio",     genres:["Action","JRPG","Beat 'em up"],                  done:true,  platform:"PlayStation"           },
+  { id:59, title:"Dragon Quest XI S: Echoes of an Elusive Age",company:"Square Enix",             genres:["JRPG","Turn-Based RPG","Fantasy"],               done:true,  platform:"PlayStation"           },
+  { id:60, title:"Dragon Quest Builders",                      company:"Square Enix",              genres:["RPG","Sandbox","Building"],                      done:true,  platform:"PlayStation"           },
+  { id:61, title:"Dragon Quest Builders 2",                    company:"Square Enix",              genres:["RPG","Sandbox","Building"],                      done:true,  platform:"PlayStation"           },
+  { id:62, title:"Final Fantasy VII Remake",                   company:"Square Enix",              genres:["Action RPG","JRPG","Story Rich"],                done:true,  platform:"PlayStation"           },
+  { id:63, title:"Octopath Traveler",                          company:"Square Enix",              genres:["JRPG","Turn-Based RPG","Fantasy"],               done:true,  platform:"Nintendo Switch"           },
+  { id:64, title:"Ghost of Tsushima",                          company:"Sucker Punch Productions", genres:["Action-Adventure","Open World","Stealth"],       done:true,  platform:"PlayStation"           },
+  { id:65, title:"Nioh 2",                                     company:"Team Ninja",               genres:["Action RPG","Souls-like","Hack and Slash"],      done:true,  platform:"PlayStation"           },
+  { id:66, title:"Nioh",                                       company:"Team Ninja",               genres:["Action RPG","Souls-like","Historical"],          done:true,  platform:"PlayStation"           },
+  { id:67, title:"The Walking Dead: A New Frontier",           company:"Telltale Games",           genres:["Adventure","Interactive Drama","Story Rich"],    done:true,  platform:"PlayStation"           },
+  { id:68, title:"Blasphemous",                                company:"The Game Kitchen",         genres:["Action-Platformer","Metroidvania","Dark Fantasy"],done:true,  platform:"PlayStation"           },
+  { id:69, title:"Odin Sphere Leifthrasir",                    company:"Vanillaware",              genres:["Action RPG","Hack and Slash","Fantasy"],         done:true,  platform:"PlayStation"           },
+  { id:70, title:"Dragon's Crown Pro",                         company:"Vanillaware",              genres:["Action RPG","Beat 'em up","Fantasy"],            done:true,  platform:"PlayStation"           },
+  { id:71, title:"Alan Wake",                                  company:"Remedy Entertainment",     genres:["Action","Psychological Horror","Third-Person Shooter","Story Rich"], done:false, platform:"Steam" },
+  { id:72, title:"Asterigos: Curse of Stars",                  company:"Acme Gamestudio",          genres:["Action RPG","Souls-like","Exploration"],         done:false, platform:"Steam" },
+  { id:73, title:"Batman: Arkham Origins",                     company:"WB Games Montréal",        genres:["Action-Adventure","Stealth","Superhero"],        done:false, platform:"Steam" },
+  { id:74, title:"The Bridge Curse 2: The Extrication",        company:"SOFTSTAR ENTERTAINMENT",   genres:["Horror","Psychological Horror","Adventure","Mystery"], done:false, platform:"Steam" },
+  { id:75, title:"Cry of Fear",                                company:"Team Psykskallar",         genres:["Survival Horror","First-Person Shooter","Psychological Horror"], done:false, platform:"Steam" },
+  { id:76, title:"Darkest Dungeon",                            company:"Red Hook Studios",         genres:["Roguelike","Turn-Based","RPG","Dark Fantasy"],   done:false, platform:"Steam" },
+  { id:77, title:"Detention",                                  company:"Red Candle Games",         genres:["Horror","Psychological Horror","Adventure"],     done:false, platform:"Steam" },
+  { id:78, title:"Devotion",                                   company:"Red Candle Games",         genres:["Horror","Psychological Horror","Adventure"],     done:false, platform:"Steam" },
+  { id:79, title:"Gone Home",                                  company:"Fullbright",               genres:["Walking Simulator","Adventure","Exploration"],   done:false, platform:"Steam" },
+  { id:80, title:"Incantation",                                company:"SOFTSTAR ENTERTAINMENT",   genres:["Horror","Psychological Horror","First-Person","Adventure"], done:false, platform:"Steam" },
+  { id:81, title:"Life is Strange",                            company:"DONTNOD Entertainment",    genres:["Adventure","Interactive Drama","Story Rich"],    done:false, platform:"Steam" },
+  { id:82, title:"Middle-earth: Shadow of Mordor",             company:"Monolith Productions",     genres:["Action RPG","Open World","Fantasy"],             done:false, platform:"Steam" },
+  { id:83, title:"Mika and The Witch's Mountain",              company:"Chibig",                   genres:["Cozy","Adventure","Exploration","Magic"],        done:false, platform:"Steam" },
+  { id:84, title:"ParanormalHK",                               company:"Fluorite Works",           genres:["Horror","Adventure","Mystery"],                  done:false, platform:"Steam" },
+  { id:85, title:"Republique",                                 company:"Camouflaj",                genres:["Adventure","Stealth","Story Rich"],              done:false, platform:"Steam" },
+  { id:86, title:"Resident Evil",                              company:"Capcom",                   genres:["Survival Horror","Action-Adventure"],            done:false, platform:"Steam" },
+  { id:87, title:"This War of Mine",                           company:"11 bit studios",           genres:["Survival","Strategy","Stealth"],                 done:false, platform:"Steam" },
+  { id:88, title:"Tomb Raider",                                company:"Crystal Dynamics",         genres:["Action-Adventure","Platformer","Stealth"],       done:false, platform:"Steam" },
+  { id:89, title:"TunTown",                                    company:"DOMO Studio",              genres:["RPG","Adventure","Cartoon"],                     done:false, platform:"Steam" },
+  { id:90, title:"The Walking Dead",                           company:"Telltale Games",           genres:["Adventure","Interactive Drama","Story Rich"],    done:false, platform:"Steam" },
+  { id:91, title:"The Walking Dead: Season Two",               company:"Telltale Games",           genres:["Adventure","Interactive Drama","Story Rich"],    done:false, platform:"Steam" },
+  { id:92, title:"Weird RPG",                                  company:"yuzhen",                   genres:["Action RPG","Souls-like","Action"],              done:false, platform:"Steam" },
+  { id:93, title:"The Wolf Among Us",                          company:"Telltale Games",           genres:["Adventure","Interactive Drama","Story Rich","Fantasy"], done:false, platform:"Steam" },
+  { id:94, title:"Word Game",                                  company:"Team9",                    genres:["Puzzle","Adventure","Exploration","Strategy"],   done:false, platform:"Steam" },
+  { id:95, title:"Tale of Immortal",                           company:"鬼谷工作室",                genres:["RPG","Open World","Sandbox","Chinese Mythology"], done:false, platform:"Steam" },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let activeGenres   = new Set();
+let activeCompany  = '';
+let searchQuery    = '';
+let statusFilter   = 'all';
+let platformFilter = 'all';
+let sortKey        = 'title';
+let sortDir        = 1;
+let filterTimeout  = null;
+
+// ── PLATFORM BADGE ────────────────────────────────────────────────────────
+function platBadge(platform) {
+  if (!platform || platform === 'Steam') return '<span class="plat-badge plat-steam">Steam</span>';
+  if (platform === 'Nintendo Switch')    return '<span class="plat-badge plat-switch">Switch</span>';
+  if (platform === 'PlayStation')      return '<span class="plat-badge plat-ps4">PlayStation</span>';
+  if (platform === 'Meta Quest')         return '<span class="plat-badge plat-quest">Meta Quest</span>';
+  return `<span class="plat-badge plat-steam">${platform}</span>`;
+}
+
+// ── BUILD TABLE ───────────────────────────────────────────────────────────
+function buildTable() {
+  const tbody = document.getElementById('game-tbody');
+  tbody.innerHTML = '';
+
+  GAMES.forEach(game => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = game.id;
+    tr.innerHTML = `
+      <td class="col-status" style="text-align:center">
+        <span class="status-dot ${game.done ? 'done' : 'todo'}">${game.done ? '✓' : '·'}</span>
+      </td>
+      <td class="col-title"><span class="title-cell">${game.title}</span></td>
+      <td class="col-studio"><span class="studio-cell">${game.company}</span></td>
+      <td class="col-genre">
+        <div class="genre-tags">${game.genres.map(g => `<span class="gtag">${g}</span>`).join('')}</div>
+      </td>
+      <td class="col-plat">${platBadge(game.platform)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const total     = GAMES.length;
+  const completed = GAMES.filter(g => g.done).length;
+  const pct       = Math.round(completed / total * 100);
+  document.getElementById('stat-total').textContent     = total;
+  document.getElementById('stat-completed').textContent = completed;
+  document.getElementById('progress-fill').style.width  = pct + '%';
+  document.getElementById('progress-pct').textContent   = pct + '%';
+}
+
+// ── BUILD FILTERS ─────────────────────────────────────────────────────────
+const TOP_GENRES = [
+  'Action RPG','JRPG','Action-Adventure','Souls-like',
+  'Open World','Interactive Drama','Platformer','Co-op',
+  'First-Person Shooter','Hack and Slash','Metroidvania','Roguelike',
+];
+
+function buildFilters() {
+  const pillContainer = document.getElementById('genre-pills');
+  TOP_GENRES.forEach(genre => {
+    const btn = document.createElement('button');
+    btn.className = 'pill';
+    btn.textContent = genre;
+    btn.dataset.genre = genre;
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      activeGenres.has(genre) ? activeGenres.delete(genre) : activeGenres.add(genre);
+      scheduleFilter();
+    });
+    pillContainer.appendChild(btn);
+  });
+
+  const sel = document.getElementById('company-select');
+  [...new Set(GAMES.map(g => g.company))].sort().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => { activeCompany = sel.value; scheduleFilter(); });
+}
+
+// ── FILTER LOGIC ──────────────────────────────────────────────────────────
+function matchesFilter(game) {
+  if (statusFilter === 'done' && !game.done) return false;
+  if (statusFilter === 'todo' &&  game.done) return false;
+  if (platformFilter !== 'all' && game.platform !== platformFilter) return false;
+  if (searchQuery) {
+    const q = searchQuery;
+    if (!game.title.toLowerCase().includes(q) &&
+        !game.company.toLowerCase().includes(q) &&
+        !game.genres.some(g => g.toLowerCase().includes(q))) return false;
+  }
+  if (activeGenres.size > 0 && ![...activeGenres].some(ag => game.genres.includes(ag))) return false;
+  if (activeCompany && game.company !== activeCompany) return false;
+  return true;
+}
+
+function scheduleFilter() {
+  clearTimeout(filterTimeout);
+  filterTimeout = setTimeout(applyFilter, searchQuery ? 160 : 0);
+}
+
+function applyFilter() {
+  const rows = [...document.querySelectorAll('#game-tbody tr:not(.empty-row)')];
+  const toHide   = [];
+  const toReveal = [];
+
+  rows.forEach(row => {
+    const game    = GAMES.find(g => g.id == row.dataset.id);
+    const matches = matchesFilter(game);
+    const hidden  = row.classList.contains('is-hidden');
+    const hiding  = row.classList.contains('is-hiding');
+    if (!matches && !hidden && !hiding) toHide.push(row);
+    else if (matches && (hidden || hiding)) toReveal.push(row);
+  });
+
+  toHide.forEach((row, i) => {
+    row.style.transitionDelay = `${i * 14}ms`;
+    row.classList.add('is-hiding');
+  });
+
+  toReveal.forEach(row => {
+    row.style.transitionDelay = '0ms';
+    row.classList.remove('is-hidden', 'is-hiding');
+    void row.offsetWidth;
+    row.classList.add('is-appearing');
+    requestAnimationFrame(() => requestAnimationFrame(() => row.classList.remove('is-appearing')));
+  });
+
+  setTimeout(() => {
+    rows.forEach(row => {
+      if (row.classList.contains('is-hiding')) {
+        row.classList.remove('is-hiding');
+        row.classList.add('is-hidden');
+        row.style.transitionDelay = '0ms';
+      }
+    });
+    updateCount();
+    updateEmptyState();
+  }, toHide.length * 14 + 260);
+
+  updateCount();
+}
+
+function updateCount() {
+  const visible = GAMES.filter(matchesFilter).length;
+  const total   = GAMES.length;
+  document.getElementById('results-count').textContent =
+    visible === total ? `${total} games` : `${visible} of ${total}`;
+}
+
+function updateEmptyState() {
+  const tbody    = document.getElementById('game-tbody');
+  const existing = tbody.querySelector('.empty-row');
+  const visible  = GAMES.filter(matchesFilter).length;
+  if (visible === 0 && !existing) {
+    const tr = document.createElement('tr');
+    tr.className = 'empty-row';
+    tr.innerHTML = '<td colspan="5">No games match your filters.</td>';
+    tbody.appendChild(tr);
+  } else if (visible > 0 && existing) {
+    existing.remove();
+  }
+}
+
+// ── SORT ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('thead th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (sortKey === key) sortDir *= -1;
+    else { sortKey = key; sortDir = 1; }
+
+    document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    const icon = th.querySelector('.sort-icon');
+    if (icon) icon.textContent = sortDir === 1 ? '↑' : '↓';
+
+    const tbody = document.getElementById('game-tbody');
+    const rows  = [...tbody.querySelectorAll('tr:not(.empty-row)')];
+    rows.sort((a, b) => {
+      const ga = GAMES.find(g => g.id == a.dataset.id);
+      const gb = GAMES.find(g => g.id == b.dataset.id);
+      let va = ga[key], vb = gb[key];
+      if (typeof va === 'boolean') { va = va ? 0 : 1; vb = vb ? 0 : 1; }
+      if (va < vb) return -sortDir;
+      if (va > vb) return  sortDir;
+      return 0;
+    });
+    rows.forEach(r => tbody.appendChild(r));
+  });
+});
+
+// ── EVENTS ────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.trim().toLowerCase();
+  scheduleFilter();
+});
+
+// Status pills (radio)
+document.querySelectorAll('#status-pills .pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#status-pills .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    statusFilter = btn.dataset.status;
+    scheduleFilter();
+  });
+});
+
+// Platform pills (radio)
+document.querySelectorAll('#platform-pills .pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#platform-pills .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    platformFilter = btn.dataset.platform;
+    scheduleFilter();
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+buildTable();
+buildFilters();
+updateCount();
+
+// Stagger entrance
+const rows = document.querySelectorAll('#game-tbody tr');
+rows.forEach((row, i) => {
+  row.style.opacity = '0';
+  row.style.transform = 'translateY(10px)';
+  row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  setTimeout(() => {
+    row.style.opacity = '';
+    row.style.transform = '';
+    setTimeout(() => { row.style.transition = ''; }, 300);
+  }, 20 + i * 14);
+});
+</script>
+</body>
+</html>
