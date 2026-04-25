@@ -88,40 +88,6 @@
     font-weight: 500;
   }
 
-  /* progress bar */
-  .progress-wrap {
-    padding: 20px 56px 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .progress-track {
-    flex: 1;
-    height: 3px;
-    background: var(--surface2);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4da6ff, #4eca7a);
-    border-radius: 99px;
-    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: 0 0 10px rgba(77,166,255,0.4);
-  }
-
-  .progress-pct {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-    flex-shrink: 0;
-    width: 36px;
-    text-align: right;
-  }
-
   /* ── FILTER BAR ── */
   .filter-bar {
     position: sticky;
@@ -258,7 +224,7 @@
   .company-select:focus { border-color: var(--accent); }
   .company-select option { background: #111827; color: var(--text); }
 
-  .results-count { font-size: 0.72rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; margin-left: auto; }
+  .results-count { display: block; font-size: 0.72rem; color: var(--muted); white-space: nowrap; text-align: right; margin-bottom: 12px; }
 
   /* ── TABLE WRAP ── */
   .table-wrap {
@@ -429,10 +395,61 @@
   ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 99px; }
 
   @media (max-width: 768px) {
-    header { padding: 24px 20px 0; flex-direction: column; align-items: flex-start; }
-    .progress-wrap, .filter-bar, .table-wrap { padding-left: 20px; padding-right: 20px; }
-    .col-studio, .col-plat { display: none; }
-    .col-genre { width: 180px; }
+    header {
+      padding: 20px 16px 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .stats { gap: 24px; }
+    .stat  { text-align: left; }
+    .stat-num { font-size: 1.9rem; }
+
+    .filter-bar { padding: 10px 16px; gap: 8px; }
+    .filter-row { flex-wrap: wrap; row-gap: 6px; }
+    .search-wrap { flex: 0 0 100%; }
+    .filter-divider { display: none; }
+    .pill { padding: 6px 12px; }
+    .company-select { flex: 1; max-width: 100%; }
+
+    .col-studio { display: none; }
+    .col-plat   { display: none; }
+    .col-genre  { width: 160px; }
+
+    .table-wrap { padding: 16px 16px 60px; }
+    td { padding: 10px 12px; }
+
+    /* Status and Platform on their own lines */
+    .filter-row:first-child {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      row-gap: 6px;
+      column-gap: 8px;
+      align-items: center;
+    }
+    .filter-row:first-child > .search-wrap { grid-column: 1 / -1; }
+    .filter-row:first-child > :nth-child(3) { grid-row: 2; grid-column: 1; }
+    .filter-row:first-child > :nth-child(4) { grid-row: 2; grid-column: 2; min-width: 0; }
+    .filter-row:first-child > :nth-child(6) { grid-row: 3; grid-column: 1; }
+    .filter-row:first-child > :nth-child(7) { grid-row: 3; grid-column: 2; min-width: 0; }
+
+    /* Genre on its own line, Studio below */
+    .filter-row:last-child {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      row-gap: 6px;
+      column-gap: 8px;
+      align-items: center;
+    }
+    .filter-row:last-child .filter-label:first-child  { grid-row: 1; grid-column: 1; }
+    .filter-row:last-child .filter-row-genres          { grid-row: 1; grid-column: 2; }
+    .filter-row:last-child .filter-label:last-of-type  { grid-row: 2; grid-column: 1; }
+    .filter-row:last-child .company-select             { grid-row: 2; grid-column: 2; }
+  }
+
+  @media (max-width: 480px) {
+    .col-genre { display: none; }
+    .table-wrap { padding: 12px 12px 60px; }
   }
 </style>
 </head>
@@ -440,8 +457,8 @@
 
 <header>
   <div class="header-left">
-    <h1>Gaming Records</h1>
-    <p>Personal collection · All platforms</p>
+    <h1>My Gaming Records</h1>
+    <p>All platforms (not you XBOX)</p>
   </div>
   <div class="stats">
     <div class="stat">
@@ -454,13 +471,6 @@
     </div>
   </div>
 </header>
-
-<div class="progress-wrap">
-  <div class="progress-track">
-    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-  </div>
-  <span class="progress-pct" id="progress-pct">0%</span>
-</div>
 
 <div class="filter-bar">
   <!-- Row 1: Search · Status · Platform · Count -->
@@ -490,7 +500,6 @@
       <button class="pill" data-platform="Meta Quest">Quest</button>
     </div>
 
-    <span class="results-count" id="results-count"></span>
   </div>
 
   <!-- Row 2: Genre · Studio -->
@@ -508,6 +517,7 @@
 </div>
 
 <div class="table-wrap">
+  <span class="results-count" id="results-count"></span>
   <table>
     <thead>
       <tr>
@@ -667,11 +677,8 @@ function buildTable() {
 
   const total     = GAMES.length;
   const completed = GAMES.filter(g => g.done).length;
-  const pct       = Math.round(completed / total * 100);
   document.getElementById('stat-total').textContent     = total;
   document.getElementById('stat-completed').textContent = completed;
-  document.getElementById('progress-fill').style.width  = pct + '%';
-  document.getElementById('progress-pct').textContent   = pct + '%';
 }
 
 // ── BUILD FILTERS ─────────────────────────────────────────────────────────
